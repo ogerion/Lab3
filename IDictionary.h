@@ -1,49 +1,22 @@
 #pragma once
-#include "UnorderedMap.h"
-
 template <class KType, class VType>
 class IDictionary
 {
-private:
-	int count;
-	UnorderedMap<KType, VType> data;
+protected:
+	size_t size;
 public:
-
-	IDictionary() : data(), count(0) {}
-
 	int GetCount()
 	{
-		return count;
+		return size;
 	}
 
-	VType Get(KType key)
-	{
-		if (data.find(key))
-		{
-			VType el;
-			data.find(key, el);
-			return el;
-		}
-		throw "There're no elements with this key!";
-	}
+	virtual VType Get(KType key) = 0;
+	
+	virtual int GetCapacity() = 0;
 
-	int GetCapacity()
-	{
-		return data.capacity();
-	}
+	virtual bool ContainsKey(KType key) = 0;
+	
+	virtual void Add(KType key, VType element) = 0;
 
-	bool ContainsKey(TKey key)
-	{
-		return data.find(key);
-	}
-
-	void Add(TKey key, VType element)
-	{
-		data.insert(key, element);
-	}
-
-	void erase(TKey key)
-	{
-		data.erase(key);
-	}
+	virtual void erase(KType key) = 0;
 };

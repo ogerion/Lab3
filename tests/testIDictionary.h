@@ -1,9 +1,9 @@
 #pragma once
-#include "./IDictionary.h"
+#include "./UnorderedMapDictionary.h"
 #include "cassert"
-void testImydictionary()
+void testIDictionary()
 {
-	IDictionary<int, int> mydict;
+	UnorderedMapDictionary<int, int> mydict;
 	mydict.Add(1, 2);
 	mydict.Add(2, 3);
 	mydict.Add(4, 5);

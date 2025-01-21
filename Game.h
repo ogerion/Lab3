@@ -26,9 +26,7 @@ private:
         {
             for (int j = 0; j < size; j++)
             {
-                char buf[10];
-                snprintf(buf, sizeof(buf), "%d", field[i][j]);
-                state += buf[0];
+                state += std::to_string(field[i][j]);
             }
             state += "\n";
         }
@@ -37,16 +35,17 @@ private:
 
     bool neighbours(int c, int r)
     {
-        bool res = false;
-        if (r - 1 >= 0 && c - 1 >= 0) res += (field[r - 1][c - 1] != 0);
-        if (r - 1 >= 0) res += (field[r - 1][c] != 0);
-        if (c - 1 >= 0) res += (field[r][c - 1] != 0);
-        if (r + 1 < size && c - 1 >= 0) res += (field[r + 1][c - 1] != 0);
-        if (r - 1 >= 0 && c + 1 < size) res += (field[r - 1][c + 1] != 0);
-        if (r + 1 < size && c + 1 < size) res += (field[r + 1][c + 1] != 0);
-        if (r + 1 < size) res += (field[r + 1][c] != 0);
-        if (c + 1 < size) res += (field[r][c + 1] != 0);
-        return res;
+        for (int i = c - 1; i <= c + 1;i++)
+        {
+            for (int j = r - 1; j <= r + 1; j++)
+            {
+                if (i >= 0 && i < size && j >= 0 && j < size && (i != c || j != r) && field[i][j] !=0)
+                {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 
     int checkDirection(int x, int y) {
@@ -80,8 +79,8 @@ private:
     int minimax(int depth, bool isMaximizing) {
         int status = checkGameStatus();
 
-        if (status == 2) return 10 - depth;
-        if (status == 1) return -10 + depth;
+        if (status == 2) return 10 - depth*10;
+        if (status == 1) return -100 + depth*10;
         if (status == -1) return 0;
 
         std::string stateKey = getFieldString();
@@ -92,7 +91,7 @@ private:
             return move;
         }
 
-        if (depth >= 4) return 0;
+        if (depth >= 5) return 0;
 
         if (isMaximizing) {
             int bestValue = -1000;
@@ -141,25 +140,15 @@ public:
         memo = UnorderedMap<std::string, int>( size*size );
 	}
 
-	bool makeMove(Move move)
+	bool makeMove(Move move, int player)
 	{
 		if (field[move.i][move.j] != 0 || move.i<0 || move.j<0 || move.i >= size || move.j >= size)
 		{
 			return false;
 		}
-		field[move.i][move.j] = 1;
+		field[move.i][move.j] = player;
 		return true;
 	}
-
-    bool makeBotMove(Move move)
-    {
-        if (move.i<0 || move.j<0 || move.i >= size || move.j >= size || field[move.i][move.j] != 0)
-        {
-            return false;
-        }
-        field[move.i][move.j] = 2;
-        return true;
-    }
 
     int checkGameStatus() {
         for (int i = 0; i < size; i++) {
@@ -188,8 +177,8 @@ public:
         int bestValue = -1000; 
         Move bestMove = {-1, -1};
 
-        for (int i = 0; i < size; ++i) {
-            for (int j = 0; j < size; ++j) {
+        for (int i = 0; i < size; i++) {
+            for (int j = 0; j < size; j++) {
                 if (field[i][j] == 0 && neighbours(i,j)) {
                     field[i][j] = 2;
                     int moveValue = minimax(0, false);
@@ -208,5 +197,14 @@ public:
     int getCell(int i, int j)
     {
         return field[i][j];
+    }
+
+    ~Game()
+    {
+        for (int i = 0; i < size; i++)
+        {
+            delete[] field[i];
+        }
+        delete[] field;
     }
 };

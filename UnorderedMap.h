@@ -36,12 +36,17 @@ private:
 			for (int j = 0; j < table[i]->GetLenght(); j++)
 			{
 				size_t new_index = hash(table[i]->Get(j).key);
-				new_table[new_index]->Append(*(new HashNode<KType,VType>(
+				HashNode<KType, VType> temp(
 					table[i]->Get(j).key,
 					table[i]->Get(j).value
-				
-				)));
+
+				);
+				new_table[new_index]->Append(temp);
 			}
+		}
+		for (int i = 0; i < current_size; i++)
+		{
+			delete table[i];
 		}
 		delete [] table;
 		table = std::move(new_table);
@@ -75,8 +80,8 @@ public:
 				return;
 			}
 		}
-
-        table[index]->Append(*(new HashNode<KType,VType>(key, value)));
+		HashNode<KType, VType> temp(key, value);
+        table[index]->Append(temp);
         ++current_size;
     }
 
@@ -94,16 +99,8 @@ public:
     }
 
 	bool find(const KType& key) const {
-		size_t index = hash(key);
-		for (int j = 0; j < table[index]->GetLenght(); j++)
-		{
-			HashNode<KType, VType> tmp = table[index]->Get(j);
-			if (tmp.key == key)
-			{
-				return true;
-			}
-		}
-		return false;
+		VType temp;
+		return this->find(key, temp);
 	}
 
     void erase(const KType& key) {
@@ -117,10 +114,10 @@ public:
 				{
 					if (k != j)
 					{
-						new_bucket.Append(HashNode<KType, VType>(
+						new_bucket->Append(*(new HashNode<KType, VType>(
 							table[index]->Get(j).key,
 							table[index]->Get(j).value
-						));
+						)));
 					}
 					
 				}
